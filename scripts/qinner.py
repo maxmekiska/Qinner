@@ -45,4 +45,4 @@ if __name__ == "__main__":
     y = np.arange(100,108,1)
 
 
-    qinner(x, y)
+    print(qinner(x, y))
