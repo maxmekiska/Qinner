@@ -4,41 +4,63 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit import Aer, execute
 import math
 
-def qinner(vec1, vec2, shots=20000, circ_show = False):
-    if len(vec1) != len(vec2):
-        raise ValueError('Lengths of states are not equal')
-        
-    N = len(vec1)
-    nqubits = math.ceil(np.log2(N))
-    
-    vec1norm = np.linalg.norm(vec1)
-    vec2norm = np.linalg.norm(vec2)
-    
-    vec1 = vec1/vec1norm
-    vec2 = vec2/vec2norm
-    
-    circ = QuantumCircuit(nqubits+1,1)
-    vec = np.concatenate((vec1,vec2))/np.sqrt(2)
-    
-    circ.initialize(vec, range(nqubits+1))
-    circ.h(nqubits)
-    circ.measure(nqubits,0)
-    
-    if circ_show == True:
-        return circ.draw(output='mpl')
 
-    backend = Aer.get_backend('qasm_simulator')
-    job = execute(circ, backend, shots=shots)
+def qinner(vec1, vec2, shots=20000):    
+    def qcomp(vec1, vec2, shots=20000):
+        if len(vec1) != len(vec2):
+            raise ValueError('Lengths of states are not equal')
 
-    result = job.result()
-    outputstate = result.get_counts(circ)
+        N = len(vec1)
+        nqubits = math.ceil(np.log2(N))
 
-    if ('0' in outputstate.keys()):
-        m_sum = float(outputstate["0"])/shots
+        vec1norm = np.linalg.norm(vec1)
+        vec2norm = np.linalg.norm(vec2)
+
+        vec1 = vec1/vec1norm
+        vec2 = vec2/vec2norm
+
+        circ = QuantumCircuit(nqubits+1,1)
+        vec = np.concatenate((vec1,vec2))/np.sqrt(2)
+
+        circ.initialize(vec, range(nqubits+1))
+        circ.h(nqubits)
+        circ.measure(nqubits,0)
+
+        backend = Aer.get_backend('qasm_simulator')
+        job = execute(circ, backend, shots=shots)
+
+        result = job.result()
+        outputstate = result.get_counts(circ)
+
+        if ('0' in outputstate.keys()):
+            m_sum = float(outputstate["0"])/shots
+        else:
+            m_sum = 0
+
+        return 2*m_sum-1
+
+    transpose = False
+    dim1 = vec1.shape[0]
+    dimvec = len(vec2.shape)
+    if dimvec == 1:
+        res = []
+        for i in range(dim1):
+            res.append(qcomp(vec1[i], vec2, shots))
     else:
-        m_sum = 0
-        
-    return 2*m_sum-1
+        transpose = True
+        dim2 = vec2.shape[0]
+        res = []
+        for j in range(dim2):
+            temp = []
+            for i in range(dim1):
+                temp.append(qcomp(vec1[i], vec2[j], shots))
+            res.append(temp)
+    res = np.array(res)
+    if transpose == False:
+        return(res)
+    else:
+        return(np.transpose(res))
+
 
 if __name__ == "__main__":
     x = np.arange(0,8,1)
