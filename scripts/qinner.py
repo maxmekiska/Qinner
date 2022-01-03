@@ -41,14 +41,22 @@ def qinner(vec1, vec2, shots=20000):
 
     transpose = False
     dim1 = vec1.shape[0]
-    dimvec = len(vec2.shape)
-    if dimvec == 1:
+    dim2 = vec2.shape[0]
+    dimvec2 = len(vec2.shape)
+    dimvec1 = len(vec1.shape)
+    if dimvec1 == 1 and dimvec2 ==1:
+        res = []
+        res.append(qcomp(vec1, vec2, shots))    
+    elif dimvec1 > 1 and dimvec2 == 1:
         res = []
         for i in range(dim1):
             res.append(qcomp(vec1[i], vec2, shots))
+    elif dimvec2 > 1 and dimvec1 == 1:
+        res = []
+        for i in range(dim2):
+            res.append(qcomp(vec1, vec2[i], shots))
     else:
         transpose = True
-        dim2 = vec2.shape[0]
         res = []
         for j in range(dim2):
             temp = []
@@ -68,3 +76,5 @@ if __name__ == "__main__":
 
 
     print(qinner(x, y))
+
+
