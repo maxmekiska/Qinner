@@ -6,7 +6,7 @@ import math
 
 
 def qinner(vec1, vec2, shots=20000):    
-    def qcomp(vec1, vec2, shots=20000):
+    def qcomp(vec1, vec2, shots):
         if len(vec1) != len(vec2):
             raise ValueError('Lengths of states are not equal')
 
