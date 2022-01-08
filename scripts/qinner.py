@@ -1,12 +1,13 @@
 import qiskit
 import numpy as np
+from numpy import array
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit import Aer, execute
 import math
 
 
-def qinner(vec1, vec2, shots=20000):    
-    def qcomp(vec1, vec2, shots):
+def qinner(vec1: array, vec2: array, shots: int = 20000) -> array:    
+    def qcomp(vec1: array, vec2: array, shots: int) -> array:
         if len(vec1) != len(vec2):
             raise ValueError('Lengths of states are not equal')
 
